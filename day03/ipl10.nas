@@ -1,4 +1,4 @@
-; hello-os
+; haribote_ipl
 ; TAB=4
 
 CYLS    EQU     10
@@ -51,10 +51,10 @@ retry:
         MOV     BX,0
         MOV     DL,0x00         ;A drive
         INT     0x13            ;call disk bios
-        JNC     fin             ;jump to fin if error
+        JNC     next            ;jump to next if not error
         ADD     SI,1            ;add 1 to SI
         CMP     SI,5
-        JAE     error           ;jump to error if SI >= 5
+        JAE     error          ;jump to error if SI >= 5
         MOV     AH,0x00
         MOV     DL,0x00         ;A drive
         INT     0x13            ;reset the drive
@@ -77,6 +77,7 @@ next:
 
 ;execute haribote.sys
 
+        MOV     [0x0ff0],CH     ;note how long have IPL loaded
         JMP     0xc200
 
 error:    
