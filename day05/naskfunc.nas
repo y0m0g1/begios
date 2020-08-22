@@ -84,7 +84,7 @@ _io_store_eflags:       ;void io_store_eflags(int eflags);
         POPFD   ;POP EFLAGS
         RET
 
-_load_idtr:             ;void load_gdtr(int limit, int addr);
+_load_gdtr:             ;void load_gdtr(int limit, int addr);
         MOV     AX,[ESP+4]
         MOV     [ESP+6], AX
         LGDT    [ESP+6]
