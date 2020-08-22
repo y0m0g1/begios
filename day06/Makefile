@@ -1,5 +1,5 @@
 # variables
-OBJS_BOOTPACK = bootpack.obj naskfunc.obj halfwidth.obj graphic.obj dsctbl.obj
+OBJS_BOOTPACK = bootpack.obj naskfunc.obj halfwidth.obj graphic.obj dsctbl.obj int.obj
 TOOLPATH = ../z_tools/
 INCPATH  = ../z_tools/haribote/
 
