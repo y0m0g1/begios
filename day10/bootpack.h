@@ -1,5 +1,6 @@
 // asmhead.nas
-struct BOOTINFO { // 0x0ff0-0x0fff
+struct BOOTINFO // 0x0ff0-0x0fff
+{
     char cyls; 
     char leds; // led status on boot
     char vmode; // video mode
@@ -40,7 +41,7 @@ unsigned int memtest_sub(unsigned int start, unsigned int end);
 void init_palette(void);
 void set_palette(int start, int end, unsigned char *rgb);
 void boxfill8(unsigned char *vram, int x, unsigned char c, int x0, int y0, int x1, int y1);
-void init_screen(char *vram, int x, int y);
+void init_screen8(char *vram, int x, int y);
 void putfont8(char *vram, int xsize, int x, int y, char c, char *font);
 void putfonts8_asc(char *vram, int xsize, int x, int y, char c, unsigned char *s);
 void init_mouse_cursor8(char *mouse, char bc);
@@ -146,7 +147,8 @@ void wait_KBC_sendready(void);
 /***************************************/
 
 // mouse.c
-struct MOUSE_DEC {
+struct MOUSE_DEC
+{
     unsigned char buf[3], phase;
     int x, y, btn;
 };
@@ -166,10 +168,12 @@ int mouse_decode(struct MOUSE_DEC *mdec, unsigned char dat);
 #define MEMMAN_FREES        4090
 #define MEMMAN_ADDR         0x003c0000
 
-struct FREEINFO {
+struct FREEINFO
+{
     unsigned int addr, size;
 };
-struct MEMMAN {
+struct MEMMAN
+{
     int frees, maxfrees, lostsize, losts;
     struct FREEINFO free[MEMMAN_FREES];
 };
@@ -181,3 +185,31 @@ unsigned int memman_alloc(struct MEMMAN *man, unsigned int size);
 int memman_free(struct MEMMAN *man, unsigned int addr, unsigned int size);
 unsigned int memman_alloc_4k(struct MEMMAN *man, unsigned int size);
 int memman_free_4k(struct MEMMAN *man, unsigned int addr, unsigned int size);
+
+/***************************************/
+
+// sheet.c
+
+#define SHEET_USE           1
+#define MAX_SHEETS          256
+
+struct SHEET
+{
+    unsigned char *buf;
+    int bxsize, bysize, vx0, vy0, col_inv, height, flags;
+};
+struct SHTCTL
+{
+    unsigned char *vram;
+    int xsize, ysize, top;
+    struct SHEET *sheets[MAX_SHEETS];
+    struct SHEET sheets0[MAX_SHEETS];
+};
+
+struct SHTCTL *shtctl_init(struct MEMMAN *memman, unsigned char *vram, int xsize, int ysize);
+struct SHEET *sheet_alloc(struct SHTCTL *ctl);
+void sheet_setbuf(struct SHEET *sht, unsigned char *buf, int xsize, int ysize, int col_inv);
+void sheet_updown(struct SHTCTL *ctl, struct SHEET *sht, int height);
+void sheet_refresh(struct SHTCTL *ctl);
+void sheet_slide(struct SHTCTL *ctl, struct SHEET *sht, int vx0, int vy0);
+void sheet_free(struct SHTCTL *ctl, struct SHEET *sht);
