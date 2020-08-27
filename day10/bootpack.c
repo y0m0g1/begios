@@ -7,7 +7,7 @@ extern struct FIFO8 keyfifo, mousefifo;
 void HariMain(void)
 {
     struct BOOTINFO *binfo = (struct BOOTINFO *) ADR_BOOTINFO;
-    char s[40], mcursor[256], keybuf[32], mousebuf[128];
+    char s[40], keybuf[32], mousebuf[128];
     int mx, my, i;
     unsigned int memtotal;
     struct MOUSE_DEC mdec;
@@ -41,20 +41,17 @@ void HariMain(void)
     init_screen8(buf_back, binfo->scrnx, binfo->scrny);
     init_mouse_cursor8(buf_mouse, 99);
     sheet_slide(shtctl, sht_back, 0, 0);
-    // init_screen(binfo->vram, binfo->scrnx, binfo->scrny);
     mx = (binfo->scrnx - 16) / 2;
     my = (binfo->scrny - 28 - 16) / 2;
     sheet_slide(shtctl, sht_mouse, mx, my);
     sheet_updown(shtctl, sht_back, 0);
     sheet_updown(shtctl, sht_mouse, 1);
-    // init_mouse_cursor8(mcursor, COL8_008484);
-    // putblock8_8(binfo->vram, binfo->scrnx, 16, 16, mx, my, mcursor, 16);
     sprintf(s, "(%3d, %3d)", mx, my);
     putfonts8_asc(buf_back, binfo->scrnx, 0, 0, COL8_FFFFFF, s);
 
     sprintf(s, "memory:%dMB    free:%dKB", memtotal/(1024*1024), memman_total(memman)/1024);
     putfonts8_asc(buf_back, binfo->scrnx, 0, 32, COL8_FFFFFF, s);
-    sheet_refresh(shtctl);
+    sheet_refresh(shtctl, sht_back, 0, 0, binfo->scrnx, 48);
 
     for (;;) 
     {
@@ -72,7 +69,7 @@ void HariMain(void)
                 sprintf(s, "%02X", i);
                 boxfill8(buf_back, binfo->scrnx, COL8_008484, 0, 16, 15, 31);
                 putfonts8_asc(buf_back, binfo->scrnx, 0, 16, COL8_FFFFFF, s);
-                sheet_refresh(shtctl);
+                sheet_refresh(shtctl, sht_back, 0, 16, 16, 32);
             }
             else if(fifo8_status(&mousefifo) != 0)
             {
@@ -95,8 +92,7 @@ void HariMain(void)
                     }
                     boxfill8(buf_back, binfo->scrnx, COL8_008484, 32, 16, 32+15*8-1, 31);
                     putfonts8_asc(buf_back, binfo->scrnx, 32, 16, COL8_FFFFFF, s);
-                    // move mouse cursor
-                    // boxfill8(binfo->vram, binfo->scrnx, COL8_008484, mx, my, mx+15, my+15); // delete cursor
+                    sheet_refresh(shtctl, sht_back, 32, 16, 32+15*8, 32);
                     mx += mdec.x;
                     my += mdec.y;
                     if (mx < 0)
@@ -118,7 +114,7 @@ void HariMain(void)
                     sprintf(s, "(%3d, %3d)", mx, my);
                     boxfill8(buf_back, binfo->scrnx, COL8_008484, 0, 0, 79, 15);
                     putfonts8_asc(buf_back, binfo->scrnx, 0, 0, COL8_FFFFFF, s);
-                    // putblock8_8(binfo->vram, binfo->scrnx, 16, 16, mx, my, mcursor, 16);
+                    sheet_refresh(shtctl, sht_back, 0, 0, 80, 16);
                     sheet_slide(shtctl, sht_mouse, mx, my);
                 }
             }
