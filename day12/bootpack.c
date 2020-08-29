@@ -171,7 +171,7 @@ void HariMain(void)
                 else
                 {
                     timer_init(timer3, &timerfifo3, 1);
-                    boxfill8(buf_back, binfo->scrnx, COL8_848484, 8, 96, 15, 111);
+                    boxfill8(buf_back, binfo->scrnx, COL8_008484, 8, 96, 15, 111);
                 }
                 timer_settime(timer3, 50);
                 sheet_refresh(sht_back, 8, 96, 16, 112);
