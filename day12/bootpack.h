@@ -119,13 +119,13 @@ void inthandler2c(int *esp);
 /***************************************/
 
 // fifo.c
+#define FLAGS_OVERRUN   0x0001
+
 struct FIFO8
 {
     unsigned char *buf;
     int p, q, size, free, flags;
 };
-
-#define FLAGS_OVERRUN   0x0001
 
 void fifo8_init(struct FIFO8 *fifo, int size, unsigned char *buf);
 int fifo8_put(struct FIFO8 *fifo, unsigned char data);
@@ -142,6 +142,8 @@ int fifo8_status(struct FIFO8 *fifo);
 #define KEYCMD_WRITE_MODE       0x60
 #define KBC_MODE                0x47
 
+extern struct FIFO8 keyfifo;
+
 void inthandler21(int *esp);
 void init_keyboard(void);
 void wait_KBC_sendready(void);
@@ -154,6 +156,7 @@ struct MOUSE_DEC
     unsigned char buf[3], phase;
     int x, y, btn;
 };
+extern struct FIFO8 mousefifo;
 
 #define KEYCMD_SENDTO_MOUSE     0xd4
 #define MOUSECMD_ENABLE         0xf4
@@ -223,8 +226,28 @@ void sheet_refreshmap(struct SHTCTL *ctl, int vx0, int vy0, int vx1, int vy1, in
 
 // timer.c
 
-#define PIT_CTRL        0x0043
-#define PIT_CNT0        0x0040
+#define PIT_CTRL            0x0043
+#define PIT_CNT0            0x0040
+#define MAX_TIMER           500
+#define TIMER_FLAGS_ALLOC   1
+#define TIMER_FLAGS_USING   2
+
+struct TIMER
+{
+    unsigned int timeout, flags;
+    struct FIFO8 *fifo;
+    unsigned char data;
+};
+struct TIMERCTL
+{
+    unsigned int count;
+    struct TIMER timer[MAX_TIMER];
+};
+extern struct TIMERCTL timerctl;
 
 void init_pit(void);
+struct TIMER *timer_alloc(void);
+void timer_free(struct TIMER *timer);
+void timer_init(struct TIMER *timer, struct FIFO8 *fifo, unsigned char data);
+void timer_settime(struct TIMER *timer, unsigned int timeout);
 void inthandler20(int *esp);
