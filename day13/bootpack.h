@@ -107,14 +107,14 @@ struct GATE_DESCRIPTOR
 };
 
 // fifo.c
-struct FIFO8
+struct FIFO32
 {
-    unsigned char *buf;
+    int *buf;
     int p, q, size, free, flags;
 };
 
 // keyboard.c
-extern struct FIFO8 keyfifo;
+// extern struct FIFO32 *keyfifo;
 
 // mouse.c
 struct MOUSE_DEC
@@ -122,7 +122,7 @@ struct MOUSE_DEC
     unsigned char buf[3], phase;
     int x, y, btn;
 };
-extern struct FIFO8 mousefifo;
+// extern struct FIFO32 *mousefifo;
 
 // memory.c
 struct FREEINFO
@@ -154,7 +154,7 @@ struct SHTCTL
 struct TIMER
 {
     unsigned int timeout, flags;
-    struct FIFO8 *fifo;
+    struct FIFO32 *fifo;
     unsigned char data;
 };
 struct TIMERCTL
@@ -211,19 +211,19 @@ void init_pic(void);
 void inthandler2c(int *esp);
 
 // fifo.c
-void fifo8_init(struct FIFO8 *fifo, int size, unsigned char *buf);
-int fifo8_put(struct FIFO8 *fifo, unsigned char data);
-int fifo8_get(struct FIFO8 *fifo);
-int fifo8_status(struct FIFO8 *fifo);
+void fifo32_init(struct FIFO32 *fifo, int size, int *buf);
+int fifo32_put(struct FIFO32 *fifo, int data);
+int fifo32_get(struct FIFO32 *fifo);
+int fifo32_status(struct FIFO32 *fifo);
 
 // keyboard.c
 void inthandler21(int *esp);
-void init_keyboard(void);
+void init_keyboard(struct FIFO32 *fifo, int data0);
 void wait_KBC_sendready(void);
 
 // mouse.c
 void inthandler27(int *esp);
-void enable_mouse(struct MOUSE_DEC *mdec);
+void enable_mouse(struct FIFO32 *fifo, int data0, struct MOUSE_DEC *mdec);
 int mouse_decode(struct MOUSE_DEC *mdec, unsigned char dat);
 
 // memory.c
@@ -250,6 +250,6 @@ void sheet_refreshmap(struct SHTCTL *ctl, int vx0, int vy0, int vx1, int vy1, in
 void init_pit(void);
 struct TIMER *timer_alloc(void);
 void timer_free(struct TIMER *timer);
-void timer_init(struct TIMER *timer, struct FIFO8 *fifo, unsigned char data);
+void timer_init(struct TIMER *timer, struct FIFO32 *fifo, int data);
 void timer_settime(struct TIMER *timer, unsigned int timeout);
 void inthandler20(int *esp);
