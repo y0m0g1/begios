@@ -6,10 +6,10 @@ int keydata0;
 /* interrupt from PS/2 keyboard */
 void inthandler21(int *esp)
 {
-    unsigned char data;
+    int data;
     io_out8(PIC0_OCW2, 0x61);
     data = io_in8(PORT_KEYDAT);
-    fifo32_put(&keyfifo, data+keydata0);
+    fifo32_put(keyfifo, data+keydata0);
     return;
 }
 

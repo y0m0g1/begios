@@ -6,11 +6,11 @@ int mousedata0;
 /* interrupt from PS/2 mouse */
 void inthandler2c(int *esp)
 {
-    unsigned char data;
+    int data;
     io_out8(PIC1_OCW2, 0x64);
     io_out8(PIC0_OCW2, 0x62);
     data = io_in8(PORT_KEYDAT);
-    fifo32_put(&mousefifo, data+mousedata0);
+    fifo32_put(mousefifo, data+mousedata0);
     return;    
 }
 
