@@ -173,6 +173,9 @@ struct TIMERCTL
     struct TIMER timers0[MAX_TIMER];
 };
 extern struct TIMERCTL timerctl;
+
+// mtask.c
+extern struct TIMER *mt_timer;
 /***************************************/
 
 /* functions */
@@ -266,3 +269,7 @@ void timer_free(struct TIMER *timer);
 void timer_init(struct TIMER *timer, struct FIFO32 *fifo, int data);
 void timer_settime(struct TIMER *timer, unsigned int timeout);
 void inthandler20(int *esp);
+
+// mtask.c
+void mt_init(void);
+void mt_taskswitch(void);
