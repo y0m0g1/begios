@@ -21,7 +21,7 @@
         EXTERN _inthandler27, _inthandler2c
         GLOBAL _load_cr0, _store_cr0
         GLOBAL _memtest_sub
-        GLOBAL _load_tr, _taskswitch4
+        GLOBAL _load_tr, _farjmp
 
 ; functions
 
@@ -213,6 +213,6 @@ _load_tr:       ;void load_tr(int tr);
         LTR     [ESP+4]                 ;tr
         RET
 
-_taskswitch4:   ;void taskswitch4(void);
-        JMP     4*8:0
+_farjmp:        ;void farjmp(int eip, int cs);
+        JMP     FAR [ESP+4]             ;eip, cs
         RET

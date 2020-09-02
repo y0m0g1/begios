@@ -196,10 +196,11 @@ int load_cr0(void);
 void store_cr0(int cr0);
 unsigned int memtest_sub(unsigned int start, unsigned int end);
 void load_tr(int tr);
-void taskswitch4(void);
+void farjmp(int eip, int cs);
 
 // bootpack.c
 void make_window8(unsigned char *buf, int xsize, int ysize, char *title);
+void task_b_main(struct SHEET *sht_back);
 
 // graphic.c
 void init_palette(void);
