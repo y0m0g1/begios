@@ -83,6 +83,8 @@
 // mtask.c
 #define MAX_TASKS               1000
 #define TASK_GDT0               3
+#define MAX_TASKS_LV            100
+#define MAX_TASKLEVELS          10
 /***************************************/
 
 /* structures */
@@ -184,13 +186,20 @@ struct TSS32
 struct TASK 
 {
     int sel, flags;
+    int level, priority;
     struct TSS32 tss;
 };
-struct TASKCTL
+struct TASKLEVEL
 {
     int running;
     int now;
-    struct TASK *tasks[MAX_TASKS];
+    struct TASK *tasks[MAX_TASKS_LV];
+};
+struct TASKCTL
+{
+    int now_lv;
+    char lv_change;
+    struct TASKLEVEL level[MAX_TASKLEVELS];
     struct TASK tasks0[MAX_TASKS];
 };
 extern struct TIMER *task_timer;
@@ -291,6 +300,10 @@ void inthandler20(int *esp);
 // mtask.c
 struct TASK *task_init(struct MEMMAN *memman);
 struct TASK *task_alloc(void);
-void task_run(struct TASK *task);
+void task_run(struct TASK *task, int level, int priority);
 void task_switch(void);
 void task_sleep(struct TASK *task);
+struct TASK *task_now(void);
+void task_add(struct TASK *task);
+void task_remove(struct TASK *task);
+void task_switchsub(void);
