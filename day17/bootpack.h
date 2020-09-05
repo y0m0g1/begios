@@ -187,6 +187,7 @@ struct TASK
 {
     int sel, flags;
     int level, priority;
+    struct FIFO32 fifo;
     struct TSS32 tss;
 };
 struct TASKLEVEL
@@ -231,6 +232,7 @@ void farjmp(int eip, int cs);
 // bootpack.c
 void make_window8(unsigned char *buf, int xsize, int ysize, char *title, char act);
 void console_task(struct SHEET *sheet);
+void make_wtitle8(unsigned char *buf, int xsize, char *title, char act);
 
 // graphic.c
 void init_palette(void);
