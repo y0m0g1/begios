@@ -3,6 +3,8 @@
 // asmhead.nas
 #define ADR_BOOTINFO            0x00000ff0
 
+// bootpack.c
+#define KEYCMD_LED              0xed
 
 // graphics.c
 #define COL8_000000             0
