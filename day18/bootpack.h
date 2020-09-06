@@ -2,6 +2,7 @@
 
 // asmhead.nas
 #define ADR_BOOTINFO            0x00000ff0
+#define ADR_DISKIMG             0x00100000
 
 // bootpack.c
 #define KEYCMD_LED              0xed
@@ -100,6 +101,15 @@ struct BOOTINFO // 0x0ff0-0x0fff
     char reserve;
     short scrnx, scrny; // resolution 
     char *vram;
+};
+
+// bootpack.c
+struct FILEINFO
+{
+    unsigned char name[8], ext[3], type;
+    char reserve[10];
+    unsigned short time, date, clustno;
+    unsigned int size;
 };
 
 // dsctbl.c
@@ -233,8 +243,9 @@ void farjmp(int eip, int cs);
 
 // bootpack.c
 void make_window8(unsigned char *buf, int xsize, int ysize, char *title, char act);
-void console_task(struct SHEET *sheet);
+void console_task(struct SHEET *sheet, unsigned int memtotal);
 void make_wtitle8(unsigned char *buf, int xsize, char *title, char act);
+int cons_newline(int cursor_y, struct SHEET *sheet);
 
 // graphic.c
 void init_palette(void);
