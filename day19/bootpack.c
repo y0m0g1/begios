@@ -472,14 +472,14 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
                         }
                         cursor_y = cons_newline(cursor_y, sheet);
                     }
-                    else if (strncmp(cmdline, "cat ", 3) == 0)
+                    else if (strncmp(cmdline, "cat ", 4) == 0)
                     {
                         for (y = 0; y < 11; y++)
                         {
                             s[y] = ' ';
                         }
                         y = 0;
-                        for (x = 0; y < 11 && cmdline[x] != 0; x++)
+                        for (x = 4; y < 11 && cmdline[x] != 0; x++)
                         {
                             if (cmdline[x] == '.' && y <= 8)
                             {
@@ -503,7 +503,7 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
                             {
                                 break;
                             }
-                            if ((finfo[x].type & 0x10) == 0)
+                            if ((finfo[x].type & 0x18) == 0)
                             {
                                 for (y = 0; y < 11; y++)
                                 {
