@@ -1,7 +1,7 @@
 # variables
 OBJS_BOOTPACK = bootpack.obj naskfunc.obj halfwidth.obj graphic.obj dsctbl.obj\
 				int.obj fifo.obj keyboard.obj mouse.obj memory.obj sheet.obj timer.obj\
-				mtask.obj
+				mtask.obj console.obj file.obj window.obj
 TOOLPATH = ../z_tools/
 INCPATH  = ../z_tools/haribote/
 

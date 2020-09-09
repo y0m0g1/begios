@@ -103,15 +103,6 @@ struct BOOTINFO // 0x0ff0-0x0fff
     char *vram;
 };
 
-// bootpack.c
-struct FILEINFO
-{
-    unsigned char name[8], ext[3], type;
-    char reserve[10];
-    unsigned short time, date, clustno;
-    unsigned int size;
-};
-
 // dsctbl.c
 struct SEGMENT_DESCRIPTOR
 {
@@ -216,6 +207,15 @@ struct TASKCTL
     struct TASK tasks0[MAX_TASKS];
 };
 extern struct TIMER *task_timer;
+
+// file.c
+struct FILEINFO
+{
+    unsigned char name[8], ext[3], type;
+    char reserve[10];
+    unsigned short time, date, clustno;
+    unsigned int size;
+};
 /***************************************/
 
 /* functions */
@@ -242,10 +242,6 @@ void load_tr(int tr);
 void farjmp(int eip, int cs);
 
 // bootpack.c
-void make_window8(unsigned char *buf, int xsize, int ysize, char *title, char act);
-void console_task(struct SHEET *sheet, unsigned int memtotal);
-void make_wtitle8(unsigned char *buf, int xsize, char *title, char act);
-int cons_newline(int cursor_y, struct SHEET *sheet);
 
 // graphic.c
 void init_palette(void);
@@ -256,8 +252,6 @@ void putfont8(char *vram, int xsize, int x, int y, char c, char *font);
 void putfonts8_asc(char *vram, int xsize, int x, int y, char c, unsigned char *s);
 void init_mouse_cursor8(char *mouse, char bc);
 void putblock8_8(char *vram, int vxsize, int pxsize, int pysize, int px0, int py0, char *buf, int bxsize);
-void putfonts8_asc_sht(struct SHEET *sht, int x, int y, int c, int b, char *s, int l);
-void make_textbox8(struct SHEET *sht, int x0, int y0, int sx, int sy, int c);
 
 // dsctbl.c
 void init_gdtidt(void);
@@ -323,3 +317,17 @@ void task_add(struct TASK *task);
 void task_remove(struct TASK *task);
 void task_switchsub(void);
 void task_idle(void);
+
+// window.c
+void make_window8(unsigned char *buf, int xsize, int ysize, char *title, char act);
+void make_wtitle8(unsigned char *buf, int xsize, char *title, char act);
+void putfonts8_asc_sht(struct SHEET *sht, int x, int y, int c, int b, char *s, int l);
+void make_textbox8(struct SHEET *sht, int x0, int y0, int sx, int sy, int c);
+
+// console.c
+void console_task(struct SHEET *sheet, unsigned int memtotal);
+int cons_newline(int cursor_y, struct SHEET *sheet);
+
+// file.c
+void file_readfat(int *fat, unsigned char *img);
+void file_loadfile(int clustno, int size, char *buf, int *fat, char *img);
