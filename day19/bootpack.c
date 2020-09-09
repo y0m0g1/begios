@@ -175,7 +175,7 @@ void HariMain(void)
                         fifo32_put(&task_cons->fifo, s[0]+256);
                     }
                 }  
-                if (i == 256+0x0e && cursor_x > 8)
+                if (i == 256+0x0e)
                 {
                     // backspace
                     if (key_to == 0)
@@ -528,16 +528,47 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
                                 // print a letter one by one
                                 s[0] = p[x];
                                 s[1] = 0;
-                                putfonts8_asc_sht(sheet, cursor_x, cursor_y, COL8_FFFFFF, COL8_000000, s, 1);
-                                cursor_x += 8;
-                                if (cursor_x == 8+240)
+                                if (s[0] == 0x09)
                                 {
+                                    // tab
+                                    for (;;)
+                                    {
+                                        putfonts8_asc_sht(sheet, cursor_x, cursor_y, COL8_FFFFFF, COL8_000000, " ", 1);
+                                        cursor_x += 8;
+                                        if (cursor_x == 8+240)
+                                        {
+                                            cursor_x = 8;
+                                            cursor_y = cons_newline(cursor_y, sheet);
+                                        }
+                                        if (((cursor_x - 8) & 0x1f) == 0)
+                                        {
+                                            break;
+                                        }
+                                    }
+                                }
+                                else if (s[0] == 0x0a)
+                                {
+                                    // new line (LF)
                                     cursor_x = 8;
                                     cursor_y = cons_newline(cursor_y, sheet);
                                 }
-                                
+                                else if (s[0] == 0x0d)
+                                {
+                                    // carrige return (CR)
+                                    // do nothing
+                                }
+                                else
+                                {
+                                    // general code
+                                    putfonts8_asc_sht(sheet, cursor_x, cursor_y, COL8_FFFFFF, COL8_000000, s, 1);
+                                    cursor_x += 8;
+                                    if (cursor_x == 8+240)
+                                    {
+                                        cursor_x = 8;
+                                        cursor_y = cons_newline(cursor_y, sheet);
+                                    }
+                                }
                             }
-                            
                         }
                         else
                         {
