@@ -21,7 +21,7 @@
         EXTERN _inthandler27, _inthandler2c
         GLOBAL _load_cr0, _store_cr0
         GLOBAL _memtest_sub
-        GLOBAL _load_tr, _farjmp
+        GLOBAL _load_tr, _farjmp, _farcall
         GLOBAL _asm_cons_putchar
         EXTERN _cons_putcher
 
@@ -217,6 +217,10 @@ _load_tr:       ;void load_tr(int tr);
 
 _farjmp:        ;void farjmp(int eip, int cs);
         JMP     FAR [ESP+4]             ;eip, cs
+        RET
+
+_farcall:       ;void farcall(int eip, int cs);
+        CALL    FAR [ESP+4]             ;eip, cs
         RET
 
 _asm_cons_putchar:
