@@ -207,17 +207,15 @@ void cons_runcmd(char *cmdline, struct CONSOLE *cons, int *fat, unsigned int mem
     {
         cmd_cat(cons, fat, cmdline);
     }
-    else if (strcmp(cmdline, "hlt") == 0)
-    {
-        // run hlt.hub application
-        cmd_hlt(cons, fat);
-    }
     else if (cmdline[0] != 0)
     {
-        // command not found
-        putfonts8_asc_sht(cons->sht, 8, cons->cur_y, COL8_FFFFFF, COL8_000000, "command not found.", 18);
-        cons_newline(cons);
-        // cons_newline(cons);
+        if (cmd_app(cons, fat, cmdline) != 0)
+        {
+            // command not found
+            putfonts8_asc_sht(cons->sht, 8, cons->cur_y, COL8_FFFFFF, COL8_000000, "command not found.", 18);
+            cons_newline(cons);
+            // cons_newline(cons);
+        }
     }
     return;
 }
@@ -311,12 +309,36 @@ void cmd_cat(struct CONSOLE *cons, int *fat, char *cmdline)
     return;
 }
 
-void cmd_hlt(struct CONSOLE *cons, int *fat)
+int cmd_app(struct CONSOLE *cons, int *fat, char *cmdline)
 {
     struct MEMMAN *memman = (struct MEMMAN *)MEMMAN_ADDR;
-    struct FILEINFO *finfo = file_search("HLT.HRB", (struct FILEINFO *)(ADR_DISKIMG+0x002600), 224);
+    struct FILEINFO *finfo;
     struct SEGMENT_DESCRIPTOR *gdt = (struct SEGMENT_DESCRIPTOR *)ADR_GDT;
-    char *p;
+    char name[18], *p;
+    int i;
+
+    // generate file name from commandline
+    for (i = 0; i < 13; i++)
+    {
+        if (cmdline[i] <= ' ')
+        {
+            break;
+        }
+        name[i] = cmdline[i];
+    }
+    name[i] = 0;
+
+    finfo = file_search(name, (struct FILEINFO *)(ADR_DISKIMG+0x002600), 224);
+    if (finfo == 0 && name[i-1]!='.')
+    {
+        name[i] = '.';
+        name[i+1] = 'H';
+        name[i+2] = 'R';
+        name[i+3] = 'B';
+        name[i+4] = 0;
+        finfo = file_search(name, (struct FILEINFO *)(ADR_DISKIMG+0x002600), 224);
+    }
+    
     if (finfo != 0)
     {
         // found
@@ -325,13 +347,14 @@ void cmd_hlt(struct CONSOLE *cons, int *fat)
         set_segmdesc(gdt+1003, finfo->size-1, (int)p, AR_CODE32_ER);
         farcall(0, 1003*8);
         memman_free_4k(memman, (int)p, finfo->size);
+        cons_newline(cons);
+        return 0;
     }
-    else
-    {
-        // not found
-        putfonts8_asc_sht(cons->sht, 8, cons->cur_y, COL8_FFFFFF, COL8_000000, "file not found.", 15);
-        // cons_newline(cons);
-    }
-    cons_newline(cons);
-    return;
+    // else
+    // {
+    //     // not found
+    //     putfonts8_asc_sht(cons->sht, 8, cons->cur_y, COL8_FFFFFF, COL8_000000, "file not found.", 15);
+    //     // cons_newline(cons);
+    // }
+    return 1; // not found
 }
