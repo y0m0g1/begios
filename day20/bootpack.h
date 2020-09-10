@@ -249,6 +249,7 @@ void load_tr(int tr);
 void farjmp(int eip, int cs);
 void farcall(int eip, int cs);
 void asm_cons_putchar(void);
+void asm_hrb_api(void);
 
 // bootpack.c
 
@@ -343,7 +344,9 @@ void cmd_clear(struct CONSOLE *cons);
 void cmd_ls(struct CONSOLE *cons);
 void cmd_cat(struct CONSOLE *cons, int *fat, char *cmdline);
 int cmd_app(struct CONSOLE *cons, int *fat, char *cmdline);
-
+void cons_putstr0(struct CONSOLE *cons, char *s);
+void cons_putstr1(struct CONSOLE *cons, char *s, int l);
+void hrb_api(int edi, int esi, int ebp, int esp, int ebx, int edx, int ecx, int eax);
 
 // file.c
 void file_readfat(int *fat, unsigned char *img);

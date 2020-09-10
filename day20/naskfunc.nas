@@ -24,6 +24,8 @@
         GLOBAL _load_tr, _farjmp, _farcall
         GLOBAL _asm_cons_putchar
         EXTERN _cons_putcher
+        GLOBAL _asm_hrb_api
+        EXTERN _hrb_api
 
 ; functions
 
@@ -232,5 +234,14 @@ _asm_cons_putchar:
         PUSH    DWORD [0x0fec]
         CALL    _cons_putcher
         ADD     ESP,12
+        POPAD
+        IRETD
+
+_asm_hrb_api:
+        STI
+        PUSHAD                          ;to store
+        PUSHAD                          ;to hrb_api
+        CALL    _hrb_api
+        ADD     ESP,32
         POPAD
         IRETD
