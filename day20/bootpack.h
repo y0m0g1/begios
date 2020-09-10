@@ -334,7 +334,7 @@ void make_textbox8(struct SHEET *sht, int x0, int y0, int sx, int sy, int c);
 // console.c
 void console_task(struct SHEET *sheet, unsigned int memtotal);
 void cons_putcher(struct CONSOLE *cons, int chr, char move);
-int cons_newline(struct CONSOLE *cons);
+void cons_newline(struct CONSOLE *cons);
 void cons_runcmd(char *cmdline, struct CONSOLE *cons, int *fat, unsigned int memtotal);
 void cmd_mem(struct CONSOLE *cons, unsigned int memtotal);
 void cmd_clear(struct CONSOLE *cons);

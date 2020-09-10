@@ -1,4 +1,5 @@
 #include "bootpack.h"
+#include <string.h>
 
 void console_task(struct SHEET *sheet, unsigned int memtotal)
 {
@@ -11,6 +12,7 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
     cons.cur_x = 8;
     cons.cur_y = 28;
     cons.cur_c = -1;
+    *((int *) 0x0fec) = (int) &cons;
     int i, fifobuf[128];
     int *fat = (int *) memman_alloc_4k(memman, 4*2880);
     
@@ -107,7 +109,7 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
     }
 }
 
-int cons_newline(struct CONSOLE *cons)
+void cons_newline(struct CONSOLE *cons)
 {
     int x, y;
     struct SHEET *sheet = cons->sht;
