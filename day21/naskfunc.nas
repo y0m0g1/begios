@@ -24,7 +24,7 @@
         GLOBAL _load_tr, _farjmp, _farcall
         GLOBAL _asm_cons_putchar
         EXTERN _cons_putcher
-        GLOBAL _asm_hrb_api
+        GLOBAL _asm_hrb_api, _start_app
         EXTERN _hrb_api
 
 ; functions
@@ -111,13 +111,36 @@ _asm_inthandler20:
         PUSH    ES
         PUSH    DS
         PUSHAD
+        MOV     AX,SS
+        CMP     AX,1*8
+        JNE     .from_app
         MOV     EAX,ESP
+        PUSH    SS
         PUSH    EAX
         MOV     AX,SS
         MOV     DS,AX
         MOV     ES,AX
         CALL    _inthandler20
+        ADD     ESP,8
+        POPAD
+        POP     DS
+        POP     ES
+        IRETD
+.from_app:
+        MOV     EAX,1*8
+        MOV     DS,AX
+        MOV     ECX,[0xfe4]
+        ADD     ECX,-8
+        MOV     [ECX+4],SS
+        MOV     [ECX],ESP
+        MOV     SS,AX
+        MOV     ES,AX
+        MOV     ESP,ECX
+        CALL    _inthandler20
+        POP     ECX
         POP     EAX
+        MOV     SS,AX
+        MOV     ESP,ECX
         POPAD
         POP     DS
         POP     ES
@@ -127,13 +150,36 @@ _asm_inthandler21:
         PUSH    ES
         PUSH    DS
         PUSHAD
+        MOV     AX,SS
+        CMP     AX,1*8
+        JNE     .from_app
         MOV     EAX,ESP
+        PUSH    SS
         PUSH    EAX
         MOV     AX,SS
         MOV     DS,AX
         MOV     ES,AX
         CALL    _inthandler21
+        ADD     ESP,8
+        POPAD
+        POP     DS
+        POP     ES
+        IRETD
+.from_app:
+        MOV     EAX,1*8
+        MOV     DS,AX
+        MOV     ECX,[0xfe4]
+        ADD     ECX,-8
+        MOV     [ECX+4],SS
+        MOV     [ECX],ESP
+        MOV     SS,AX
+        MOV     ES,AX
+        MOV     ESP,ECX
+        CALL    _inthandler21
+        POP     ECX
         POP     EAX
+        MOV     SS,AX
+        MOV     ESP,ECX
         POPAD
         POP     DS
         POP     ES
@@ -143,13 +189,36 @@ _asm_inthandler27:
         PUSH    ES
         PUSH    DS
         PUSHAD
+        MOV     AX,SS
+        CMP     AX,1*8
+        JNE     .from_app
         MOV     EAX,ESP
+        PUSH    SS
         PUSH    EAX
         MOV     AX,SS
         MOV     DS,AX
         MOV     ES,AX
         CALL    _inthandler27
+        ADD     ESP,8
+        POPAD
+        POP     DS
+        POP     ES
+        IRETD
+.from_app:
+        MOV     EAX,1*8
+        MOV     DS,AX
+        MOV     ECX,[0xfe4]
+        ADD     ECX,-8
+        MOV     [ECX+4],SS
+        MOV     [ECX],ESP
+        MOV     SS,AX
+        MOV     ES,AX
+        MOV     ESP,ECX
+        CALL    _inthandler27
+        POP     ECX
         POP     EAX
+        MOV     SS,AX
+        MOV     ESP,ECX
         POPAD
         POP     DS
         POP     ES
@@ -159,13 +228,36 @@ _asm_inthandler2c:
         PUSH    ES
         PUSH    DS
         PUSHAD
+        MOV     AX,SS
+        CMP     AX,1*8
+        JNE     .from_app
         MOV     EAX,ESP
+        PUSH    SS
         PUSH    EAX
         MOV     AX,SS
         MOV     DS,AX
         MOV     ES,AX
         CALL    _inthandler2c
+        ADD     ESP,8
+        POPAD
+        POP     DS
+        POP     ES
+        IRETD
+.from_app:
+        MOV     EAX,1*8
+        MOV     DS,AX
+        MOV     ECX,[0xfe4]
+        ADD     ECX,-8
+        MOV     [ECX+4],SS
+        MOV     [ECX],ESP
+        MOV     SS,AX
+        MOV     ES,AX
+        MOV     ESP,ECX
+        CALL    _inthandler2c
+        POP     ECX
         POP     EAX
+        MOV     SS,AX
+        MOV     ESP,ECX
         POPAD
         POP     DS
         POP     ES
@@ -238,10 +330,82 @@ _asm_cons_putchar:
         IRETD
 
 _asm_hrb_api:
-        STI
-        PUSHAD                          ;to store
-        PUSHAD                          ;to hrb_api
+        PUSH    DS
+        PUSH    ES
+        PUSHAD
+        MOV     EAX,1*8
+        MOV     DS,AX                   ;set DS as OS
+        MOV     ECX,[0xfe4]             ;OS's ESP
+        ADD     ECX,-40
+        MOV     [ECX+32],ESP            ;store app's ESP
+        MOV     [ECX+36],SS             ;store app's SS
+        ; copy PUSHADed data to system stack
+        MOV     EDX,[ESP]
+        MOV     EBX,[ESP+4]
+        MOV     [ECX],EDX
+        MOV     [ECX+4],EBX
+        MOV     EDX,[ESP+8]
+        MOV     EBX,[ESP+12]
+        MOV     [ECX+8],EDX
+        MOV     [ECX+12],EBX
+        MOV     EDX,[ESP+16]
+        MOV     EBX,[ESP+20]
+        MOV     [ECX+16],EDX
+        MOV     [ECX+20],EBX
+        MOV     EDX,[ESP+24]
+        MOV     EBX,[ESP+28]
+        MOV     [ECX+24],EDX
+        MOV     [ECX+28],EBX
+
+        MOV     ES,AX
+        MOV     SS,AX
+        MOV     ESP,ECX
+        STI                             ;enable interruption
         CALL    _hrb_api
-        ADD     ESP,32
+        MOV     ECX,[ESP+32]            ;recall app's ESP
+        MOV     EAX,[ESP+36]            ;recall app's SS
+        CLI                             ;disable interruption
+        MOV     SS,AX
+        MOV     ESP,ECX
         POPAD
-        IRETD
+        POP     ES
+        POP     DS
+        IRETD                           ;STI(enable interruption)automatically
+        ; STI
+        ; PUSHAD                          ;to store
+        ; PUSHAD                          ;to hrb_api
+        ; CALL    _hrb_api
+        ; ADD     ESP,32
+        ; POPAD
+        ; IRETD
+
+_start_app:     ;void start_app(int eip, int cs, int esp, int ds);
+        PUSHAD                          ;store all data in 32bit registers
+        MOV     EAX,[ESP+36]            ;eip
+        MOV     ECX,[ESP+40]            ;cs
+        MOV     EDX,[ESP+44]            ;esp
+        MOV     EBX,[ESP+48]            ;ds
+        MOV     [0xfe4],ESP
+        CLI                             ;disable interruption
+        MOV     ES,BX
+        MOV     SS,BX
+        MOV     DS,BX
+        MOV     FS,BX
+        MOV     GS,BX
+        MOV     ESP,EDX
+        STI                             ;enable interruption
+        PUSH    ECX                     ;push cs for far-call
+        PUSH    EAX                     ;push eip for far-call
+        CALL    FAR [ESP]               ;call app
+        ;return here after terminate app
+        MOV     EAX,1*8                 ;set DS/SS as OS
+        CLI                             ;disable interruption
+        MOV     ES,AX
+        MOV     SS,AX
+        MOV     DS,AX
+        MOV     FS,AX
+        MOV     GS,AX
+        MOV     ESP,[0xfe4]
+        STI                             ;enable interruption
+        POPAD                           ;restore register data
+        RET
